@@ -7,7 +7,7 @@ import re
 
 app = Flask(__name__)
 # A secret key is required to use sessions for login management
-app.secret_key = 'your_super_secret_key' 
+app.secret_key = 'VeEr_007' 
 
 # --- Hardcoded Admin Credentials ---
 ADMIN_USERNAME = "admin"
