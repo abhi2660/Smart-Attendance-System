@@ -131,24 +131,19 @@
             document.getElementById('editModal').style.display = 'none';
         }
 
-        // --- NEW SCRIPT FOR GUIDED ACTIONS ON PAGE LOAD ---
+      
         window.onload = function() {
-            // This function runs automatically as soon as the page is fully loaded.
-            
-            // Function to handle the second question (Reset).
             const askToReset = () => {
-                // Use a short timeout to prevent browser pop-up blocking issues.
                 setTimeout(() => {
                     if (confirm("Do you want to reset all student statuses to 'Absent' for a new session?")) {
-                        // If user clicks 'OK', redirect to the reset URL.
                         window.location.href = "{{ url_for('reset_attendance') }}";
                     }
-                }, 100); // 100ms delay
+                }, 100); 
             };
 
-            // First, ask about downloading the attendance sheet.
+            
             if (confirm("Do you want to download the current attendance sheet?")) {
-                // If user clicks 'OK', trigger the download without leaving the page.
+                
                 const link = document.createElement('a');
                 link.href = "{{ url_for('download_attendance') }}";
                 link.setAttribute('download', 'attendance.csv');
@@ -156,11 +151,10 @@
                 link.click();
                 document.body.removeChild(link);
 
-                // After starting the download, ask the reset question.
+                
                 askToReset();
             } else {
-                // If user clicks 'Cancel' on the download question,
-                // just ask the reset question directly.
+                
                 askToReset();
             }
         };
