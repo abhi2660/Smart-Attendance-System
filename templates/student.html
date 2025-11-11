@@ -31,7 +31,7 @@
         const statusContainerEl = document.getElementById('status-container');
         const videoFeedEl = document.getElementById('video-feed');
 
-        
+
         let isRedirecting = false;
 
         
@@ -46,10 +46,10 @@
                 statusMessageEl.textContent = data.message;
                 statusContainerEl.style.backgroundColor = data.color;
 
-                // attendance is successful OR they are already marked present.
+                
                 if ((data.status === 'success' || data.status === 'info') && !isRedirecting && data.message.includes('present')) {
-                    isRedirecting = true; // Set the flag
-                    // Wait 2 seconds to show the message
+                    isRedirecting = true; 
+                    
                     setTimeout(() => {
                         window.location.href = "{{ url_for('index') }}";
                     }, 2000);
@@ -58,7 +58,7 @@
             } catch (error) {
                 console.error('Error fetching status:', error);
                 statusMessageEl.textContent = 'Error connecting to server.';
-                statusContainerEl.style.backgroundColor = '#dc3545'; 
+                statusContainerEl.style.backgroundColor = '#dc3545'; // Red
             }
         }
         
@@ -67,7 +67,7 @@
             statusContainerEl.style.backgroundColor = '#dc3545';
         };
 
-    
+        
         setInterval(fetchStatus, 1000);
     </script>
 </body>

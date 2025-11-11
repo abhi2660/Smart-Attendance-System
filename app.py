@@ -4,6 +4,8 @@ from flask import Flask, render_template, Response, request, jsonify, redirect, 
 import threading
 import time
 import re
+from datetime import datetime
+import traceback
 
 app = Flask(__name__)
 # A secret key is required to use sessions for login management
@@ -40,19 +42,49 @@ def mark_attendance(student_id):
     global attendance_status
     try:
         df = pd.read_csv('students.csv', dtype={'ID': str})
+
+        if 'ID' not in df.columns or 'Name' not in df.columns:
+            raise KeyError("students.csv must contain 'ID' and 'Name' columns")
+
+        today_col = datetime.now().strftime('%Y-%m-%d')
+        timestamp = datetime.now().strftime('%H:%M:%S')
+
+        if today_col not in df.columns:
+            df[today_col] = 'Absent'
+
+
         if student_id in df['ID'].values:
             student_name = df.loc[df['ID'] == student_id, 'Name'].values[0]
-            current_status = df.loc[df['ID'] == student_id, 'Status'].values[0]
-            if current_status == 'Absent':
-                df.loc[df['ID'] == student_id, 'Status'] = 'Present'
-                df.to_csv('students.csv', index=False)
-                attendance_status = {"status": "success", "message": f"Welcome, {student_name}! Marked present.", "color": "#28a745"}
+            current_status = df.loc[df['ID'] == student_id, today_col].values[0]
+            
+              
+
+            if str(current_status).strip().lower().startswith('abs'):
+                df.loc[df['ID'] == student_id, today_col] = f'Present ({timestamp})'
+                message = f"Welcome, {student_name}! Marked present at {timestamp}."
+                color = "#28a745"
             else:
-                attendance_status = {"status": "info", "message": f"Hi, {student_name}. Already marked as present.", "color": "#17a2b8"}
+                message = f"Hi, {student_name}. Already marked present today."
+                color = "#17a2b8"
+            
+            attendance_status = {"status": "success", "message": message, "color": color}
+            df.to_csv('students.csv', index=False)
+
         else:
             attendance_status = {"status": "error", "message": f"Error: Student ID '{student_id}' not found.", "color": "#dc3545"}
+
+        df.to_csv('students.csv', index=False)
+
+    except FileNotFoundError:
+        attendance_status = {
+            "status": "error",
+            "message": "Student database (students.csv) not found.",
+            "color": "#dc3545"
+        }
+
     except Exception as e:
-        print(f"Error in mark_attendance: {e}")
+        print(f"Error in mark_attendance")
+        traceback.print_exc()
         attendance_status = {"status": "error", "message": "Error processing attendance.", "color": "#dc3545"}
 
 def generate_frames():
@@ -125,7 +157,7 @@ def admin():
                 student_id = request.form.get('student_id')
                 student_name = request.form.get('student_name')
                 if student_id not in df['ID'].values:
-                    new_student = pd.DataFrame([{'ID': student_id, 'Name': student_name, 'Status': 'Absent'}])
+                    new_student = pd.DataFrame([{'ID': student_id, 'Name': student_name}])
                     df = pd.concat([df, new_student], ignore_index=True)
                     flash(f'Student {student_name} added successfully.')
                 else:
@@ -192,17 +224,21 @@ def download_attendance():
         flash('Could not find students.csv to download.')
         return redirect(url_for('admin'))
 
+# after reset  data only ID and NAME column will remaining
+
 @app.route('/reset_attendance')
 def reset_attendance():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     try:
         df = pd.read_csv('students.csv', dtype={'ID': str})
-        df['Status'] = 'Absent'
+        df = df[['ID', 'Name']]
         df.to_csv('students.csv', index=False)
         flash('Attendance has been successfully reset for a new session.')
     except FileNotFoundError:
         flash('Student database (students.csv) not found.')
+    except Exception as e:
+        flash(f'Error resetting attendance: {e}')
     return redirect(url_for('admin'))
 
 
