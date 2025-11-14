@@ -8,14 +8,13 @@ from datetime import datetime
 import traceback
 
 app = Flask(__name__)
-# A secret key is required to use sessions for login management
+
 app.secret_key = 'VeEr_007' 
 
-# --- Hardcoded Admin Credentials ---
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "password"
 
-# --- Global Variables ---
+
 camera = None
 last_scan_time = 0
 last_scanned_id = None
@@ -157,7 +156,7 @@ def admin():
                 student_id = request.form.get('student_id')
                 student_name = request.form.get('student_name')
                 if student_id not in df['ID'].values:
-                    new_student = pd.DataFrame([{'ID': student_id, 'Name': student_name}])
+                    new_student = pd.DataFrame([{'ID': student_id, 'Name': student_name, 'Status': 'Absent'}])
                     df = pd.concat([df, new_student], ignore_index=True)
                     flash(f'Student {student_name} added successfully.')
                 else:
