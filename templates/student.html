@@ -34,7 +34,7 @@
         
         let isRedirecting = false;
 
-        
+        // Function to fetch the latest status from the server
         async function fetchStatus() {
             try {
                 const response = await fetch('/get_status');
@@ -46,7 +46,7 @@
                 statusMessageEl.textContent = data.message;
                 statusContainerEl.style.backgroundColor = data.color;
 
-                
+                // If attendance is successful OR they are already marked present, and we are not already redirecting...
                 if ((data.status === 'success' || data.status === 'info') && !isRedirecting && data.message.includes('present')) {
                     isRedirecting = true; // Set the flag
                     // Wait 2 seconds to show the message, then redirect.

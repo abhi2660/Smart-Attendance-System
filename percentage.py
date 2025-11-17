@@ -7,7 +7,7 @@ from typing import Optional, Dict
 DATE_COL_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 
 def _is_present_cell(cell_value: object) -> bool:
-   
+    
     try:
         s = str(cell_value).strip().lower()
     except Exception:
@@ -15,7 +15,7 @@ def _is_present_cell(cell_value: object) -> bool:
     return s.startswith('present')
 
 def calculate_attendance_percentage(student_id: str, csv_path: str = 'students.csv') -> Dict[str, object]:
-   
+
     if not os.path.exists(csv_path):
         return {"ok": False, "message": "students.csv not found."}
 
@@ -27,9 +27,9 @@ def calculate_attendance_percentage(student_id: str, csv_path: str = 'students.c
     if 'ID' not in df.columns or 'Name' not in df.columns:
         return {"ok": False, "message": "CSV missing required 'ID' or 'Name' columns."}
 
-   
+    
     date_cols = [c for c in df.columns if DATE_COL_RE.match(c)]
-   
+    
     if len(date_cols) == 0:
         
         row = df.loc[df['ID'] == student_id]
