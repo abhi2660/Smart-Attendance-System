@@ -7,10 +7,7 @@ from typing import Optional, Dict
 DATE_COL_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 
 def _is_present_cell(cell_value: object) -> bool:
-    """
-    Return True if the CSV cell indicates presence.
-    Handles formats like 'Present', 'Present (HH:MM:SS)', etc.
-    """
+   
     try:
         s = str(cell_value).strip().lower()
     except Exception:
@@ -18,20 +15,7 @@ def _is_present_cell(cell_value: object) -> bool:
     return s.startswith('present')
 
 def calculate_attendance_percentage(student_id: str, csv_path: str = 'students.csv') -> Dict[str, object]:
-    """
-    Calculate attendance percentage for one student.
-    Returns a dict:
-        {
-          "ok": True/False,
-          "message": "...",
-          "student_id": "...",
-          "student_name": "...",
-          "present_count": int,
-          "total_days": int,
-          "percentage": float
-        }
-    If error, ok=False and message contains error.
-    """
+   
     if not os.path.exists(csv_path):
         return {"ok": False, "message": "students.csv not found."}
 
@@ -43,11 +27,11 @@ def calculate_attendance_percentage(student_id: str, csv_path: str = 'students.c
     if 'ID' not in df.columns or 'Name' not in df.columns:
         return {"ok": False, "message": "CSV missing required 'ID' or 'Name' columns."}
 
-    # Select date columns only
+   
     date_cols = [c for c in df.columns if DATE_COL_RE.match(c)]
-    # If no date columns, return zero/empty
+   
     if len(date_cols) == 0:
-        # Still try to find student name if possible
+        
         row = df.loc[df['ID'] == student_id]
         if row.empty:
             return {"ok": False, "message": "Student not found.", "student_id": student_id}
@@ -90,10 +74,7 @@ def calculate_attendance_percentage(student_id: str, csv_path: str = 'students.c
     }
 
 def get_all_students_percentage(csv_path: str = 'students.csv') -> Dict[str, Dict]:
-    """
-    Return a dict mapping student_id -> attendance summary (same fields as above).
-    Useful if admin wants all students % at once.
-    """
+    
     output = {}
     if not os.path.exists(csv_path):
         return output

@@ -7,6 +7,9 @@ import re
 from datetime import datetime
 import traceback
 
+
+from percentage import get_all_students_percentage
+
 app = Flask(__name__)
 
 app.secret_key = 'VeEr_007' 
@@ -222,6 +225,19 @@ def download_attendance():
     except FileNotFoundError:
         flash('Could not find students.csv to download.')
         return redirect(url_for('admin'))
+    
+# show attendance percentages
+
+@app.route('/attendance_percentages')
+def attendance_percentages_page():
+    
+    data = get_all_students_percentage('students.csv')
+    # Convert to a sorted list by student name for predictable display
+    students = sorted(data.values(), key=lambda x: x.get('student_name', ''))
+    return render_template('percentage.html', students=students)
+
+
+
 
 # after reset  data only ID and NAME column will remaining
 
