@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Attendance Percentages</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <a href="{{ url_for('index') }}" class="text-cyan-400 hover:text-cyan-300">&larr; Back to Home</a>
+      <h1 class="text-3xl font-bold text-cyan-400">Attendance Percentage — All Students</h1>
+      <a href="{{ url_for('admin') }}" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-3 rounded-lg">Admin</a>
+    </div>
+
+    <div class="bg-gray-800 p-6 rounded-2xl shadow-xl">
+      <p class="text-gray-400 mb-4">This table shows attendance percentage computed from the CSV (Present entries / total days).</p>
+
+      <div class="overflow-x-auto rounded-lg">
+        <table class="w-full text-left">
+          <thead class="bg-gray-700">
+            <tr>
+              <th class="p-3">Student ID</th>
+              <th class="p-3">Name</th>
+              <th class="p-3">Present</th>
+              <th class="p-3">Total Days</th>
+              <th class="p-3">Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if students and students|length > 0 %}
+              {% for s in students %}
+                <tr class="border-b border-gray-700 hover:bg-gray-700">
+                  <td class="p-3 align-top">{{ s.student_id }}</td>
+                  <td class="p-3 align-top">{{ s.student_name }}</td>
+                  <td class="p-3 align-top">{{ s.present_count }}</td>
+                  <td class="p-3 align-top">{{ s.total_days }}</td>
+                  <td class="p-3 align-top">
+                    <span
+                      class="
+                        font-semibold
+                        {% if s.percentage >= 75 %} text-green-400 {% elif s.percentage >= 50 %} text-yellow-300 {% else %} text-red-400 {% endif %}
+                      ">
+                      {{ '%.2f'|format(s.percentage) }}%
+                    </span>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="5" class="p-6 text-center text-gray-400">No students or no attendance days recorded yet.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4 flex items-center justify-between">
+        <div class="text-sm text-gray-400">Data source: <code>students.csv</code></div>
+        <div>
+          <a href="{{ url_for('download_attendance') }}" class="bg-cyan-600 hover:bg-cyan-500 px-4 py-2 rounded-lg font-bold">Download CSV</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
