@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin - Leave Requests</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <h2>Leave Requests</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ 'success' if category=='success' else 'info' if category=='info' else 'danger' }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="mb-3">
+      <a href="{{ url_for('admin') }}" class="btn btn-outline-secondary">Admin Home</a>
+      <a href="{{ url_for('download_leave_requests') }}" class="btn btn-outline-primary">Download CSV</a>
+    </div>
+
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Roll Number</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Submitted</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in requests %}
+        <tr>
+          <td style="max-width:160px;word-wrap:break-word;">{{ r.id }}</td>
+          <td>{{ r.name }}</td>
+          <td>{{ r.roll_number }}</td>
+          <td>{{ r.leave_start_date }}</td>
+          <td>{{ r.leave_end_date }}</td>
+          <td>{{ r.submitted_at }}</td>
+          <td>
+            {% if r.status == 'Pending' %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% elif r.status == 'Approved' %}
+              <span class="badge bg-success">Approved</span>
+            {% elif r.status == 'Rejected' %}
+              <span class="badge bg-danger">Rejected</span>
+            {% else %}
+              <span class="badge bg-secondary">{{ r.status }}</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if r.status == 'Pending' %}
+              <form method="post" action="{{ url_for('approve_leave_request', request_id=r.id) }}" style="display:inline">
+                <button class="btn btn-sm btn-success" type="submit">Approve</button>
+              </form>
+              <form method="post" action="{{ url_for('reject_leave_request', request_id=r.id) }}" style="display:inline; margin-left:6px;">
+                <button class="btn btn-sm btn-danger" type="submit">Reject</button>
+              </form>
+            {% else %}
+              <em>No actions</em>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
