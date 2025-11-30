@@ -1,12 +1,12 @@
 import cv2
 import pandas as pd
-from flask import Flask, render_template, Response, request, jsonify, redirect, url_for, session, flash, make_response
+from flask import Flask, render_template, Response, request, jsonify, redirect, url_for, session, flash, make_response, send_file
 import threading
 import time
 import re
 from datetime import datetime
 import traceback
-
+import leave
 
 from percentage import get_all_students_percentage
 
@@ -133,6 +133,7 @@ def login():
         password = request.form.get('password')
         if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['logged_in'] = True
+            session['admin_user'] = username
             return redirect(url_for('admin'))
         else:
             flash('Invalid credentials. Please try again.')
@@ -255,6 +256,126 @@ def reset_attendance():
     except Exception as e:
         flash(f'Error resetting attendance: {e}')
     return redirect(url_for('admin'))
+
+
+# Leave request 
+
+
+@app.route("/leave_request", methods=["GET", "POST"])
+def leave_request():
+    """
+    Student-facing: GET shows form, POST validates and appends request to CSV.
+    """
+
+    errors = []
+    success_msg = None
+    form_data = {}
+
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        roll = request.form.get("roll_number", "").strip()
+        start = request.form.get("leave_start_date", "").strip()
+        end = request.form.get("leave_end_date", "").strip()
+
+
+        form_data = {
+            "name": name,
+            "roll_number": roll,
+            "leave_start_date": start,
+            "leave_end_date": end
+        } 
+
+        # Basic validation
+        
+        if not name:
+            errors.append("Name is required.")
+        if not roll:
+            errors.append("Roll number is required.")
+        if not start:
+            errors.append("Leave start date is required.")
+        if not end:
+            errors.append("Leave end date is required.")
+
+        # Validate date format (YYYY-MM-DD)
+        try:
+            sd = datetime.strptime(start, "%Y-%m-%d")
+            ed = datetime.strptime(end, "%Y-%m-%d")
+            if ed < sd:
+                errors.append("End date cannot be earlier than start date.")
+        except ValueError:
+            errors.append("Dates must be in YYYY-MM-DD format.")
+
+        if not errors:
+            # Append to CSV via leave.py
+            leave.append_leave_request(name, roll, start, end)
+            success_msg = f"Leave request submitted successfully."
+            flash(success_msg, "success")
+            # clear form after success
+            form_data = {}
+
+    # Always load all requests from CSV and pass to the template
+    all_requests = leave.read_all_leave_requests()
+
+    # Optionally: sort by submitted_at descending so newest first
+    try:
+        all_requests.sort(key=lambda r: r.get("submitted_at", ""), reverse=True)
+    except Exception:
+        pass
+
+    return render_template(
+        "leave_request.html",
+        errors=errors,
+        success=success_msg,
+        form=form_data,
+        requests=all_requests
+    )
+
+
+@app.route("/admin/leave_requests")
+def admin_leave_requests():
+    """
+    Admin-facing: list leave requests.
+    Replace session key check if your app uses a different key for admin auth.
+    """
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
+    rows = leave.read_all_leave_requests()
+    return render_template("admin_leave_requests.html", requests=rows)
+
+
+@app.route("/admin/leave_requests/<request_id>/approve", methods=["POST"])
+def approve_leave_request(request_id):
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
+    ok = leave.update_leave_status(request_id, "Approved")
+    if ok:
+        flash("Leave request approved.", "success")
+    else:
+        flash("Request not found.", "danger")
+    return redirect(url_for("admin_leave_requests"))
+
+
+@app.route("/admin/leave_requests/<request_id>/reject", methods=["POST"])
+def reject_leave_request(request_id):
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
+    ok = leave.update_leave_status(request_id, "Rejected")
+    if ok:
+        flash("Leave request rejected.", "info")
+    else:
+        flash("Request not found.", "danger")
+    return redirect(url_for("admin_leave_requests"))
+
+
+@app.route("/admin/download_leave_requests")
+def download_leave_requests():
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
+    leave.ensure_leave_csv()
+    return send_file(leave.LEAVE_CSV, as_attachment=True, download_name="leave_requests.csv")
+
+
+
 
 
 if __name__ == '__main__':

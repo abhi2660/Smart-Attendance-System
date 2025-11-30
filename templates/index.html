@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -13,7 +13,7 @@
 <body class="bg-gray-900 text-white flex items-center justify-center h-screen">
     <div class="text-center p-8 bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full">
         <h1 class="text-4xl font-bold mb-2 text-cyan-400">QR Code Attendance System</h1>
-        <p class="text-gray-400 mb-8">Please select your role to continue.</p>
+        <p class="text-gray-400 mb-8">Please select one option to continue.</p>
         <div class="flex flex-col md:flex-row gap-4 justify-center">
             <a href="{{ url_for('admin') }}" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
                 Admin Dashboard
@@ -21,6 +21,11 @@
             <a href="{{ url_for('student') }}" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
                 Student Dashboard
             </a>
+           <a href="{{ url_for('leave_request') }}" class="w-full md:w-auto bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
+                Request Leave
+            </a>
+
+
             <a href="/attendance_percentages" class="w-full md:w-auto bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
                 Attendance Percentage
             </a>
@@ -28,5 +33,59 @@
         </div>
     </div>
 </body>
-</html>
+</html> -->
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Attendance System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
+
+    <div class="text-center p-10 bg-gray-800 rounded-3xl shadow-2xl max-w-3xl w-full">
+
+        <h1 class="text-4xl font-bold mb-3 text-cyan-400">
+            QR Code Attendance System
+        </h1>
+
+        <p class="text-gray-400 mb-10">
+            Please select one option to continue.
+        </p>
+
+        <!-- Buttons Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 justify-center">
+
+            <a href="{{ url_for('admin') }}" 
+               class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl shadow-lg transition-transform transform hover:scale-105">
+                Admin Dashboard
+            </a>
+
+            <a href="{{ url_for('student') }}" 
+               class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition-transform transform hover:scale-105">
+                Student Dashboard
+            </a>
+
+            <a href="{{ url_for('leave_request') }}" 
+               class="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-4 rounded-xl shadow-lg transition-transform transform hover:scale-105">
+                Request Leave
+            </a>
+
+            <a href="/attendance_percentages" 
+               class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-xl shadow-lg transition-transform transform hover:scale-105">
+                Attendance Percentage
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
