@@ -263,9 +263,6 @@ def reset_attendance():
 
 @app.route("/leave_request", methods=["GET", "POST"])
 def leave_request():
-    """
-    Student-facing: GET shows form, POST validates and appends request to CSV.
-    """
 
     errors = []
     success_msg = None
@@ -306,17 +303,17 @@ def leave_request():
             errors.append("Dates must be in YYYY-MM-DD format.")
 
         if not errors:
-            # Append to CSV via leave.py
+            
             leave.append_leave_request(name, roll, start, end)
             success_msg = f"Leave request submitted successfully."
             flash(success_msg, "success")
-            # clear form after success
+            
             form_data = {}
 
-    # Always load all requests from CSV and pass to the template
+    
     all_requests = leave.read_all_leave_requests()
 
-    # Optionally: sort by submitted_at descending so newest first
+    
     try:
         all_requests.sort(key=lambda r: r.get("submitted_at", ""), reverse=True)
     except Exception:
@@ -333,10 +330,7 @@ def leave_request():
 
 @app.route("/admin/leave_requests")
 def admin_leave_requests():
-    """
-    Admin-facing: list leave requests.
-    Replace session key check if your app uses a different key for admin auth.
-    """
+    
     if not session.get("logged_in"):
         return redirect(url_for("login"))
     rows = leave.read_all_leave_requests()

@@ -46,6 +46,7 @@ def calculate_attendance_percentage(student_id: str, csv_path: str = 'students.c
             "percentage": 0.0
         }
 
+        # if condition is true then store the respective data of that student in same  format as csv
     row = df.loc[df['ID'] == student_id]
     if row.empty:
         return {"ok": False, "message": "Student not found.", "student_id": student_id}
@@ -88,6 +89,8 @@ def get_all_students_percentage(csv_path: str = 'students.csv') -> Dict[str, Dic
         return output
 
     date_cols = [c for c in df.columns if DATE_COL_RE.match(c)]
+
+    #    iterate each row of csv
     for _, row in df.iterrows():
         sid = str(row['ID'])
         name = row['Name']

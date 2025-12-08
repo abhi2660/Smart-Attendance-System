@@ -49,12 +49,12 @@
 
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">Leave Start Date (YYYY-MM-DD)</label>
-              <input name="leave_start_date" class="form-control" placeholder="2025-12-01" value="{{ form.leave_start_date if form else '' }}" required>
+              <label class="form-label">Leave Start Date </label>
+              <input name="leave_start_date" class="form-control" placeholder="YYYY-MM-DD" value="{{ form.leave_start_date if form else '' }}" required>
             </div>
             <div class="col-md-6 mb-3">
-              <label class="form-label">Leave End Date (YYYY-MM-DD)</label>
-              <input name="leave_end_date" class="form-control" placeholder="2025-12-03" value="{{ form.leave_end_date if form else '' }}" required>
+              <label class="form-label">Leave End Date </label>
+              <input name="leave_end_date" class="form-control" placeholder="YYYY-MM-DD" value="{{ form.leave_end_date if form else '' }}" required>
             </div>
           </div>
 
@@ -80,7 +80,7 @@
                   <th>Start Date</th>
                   <th>End Date</th>
                   <th>Status</th>
-                  <th>Submitted At (UTC)</th>
+                  <th>Submitted</th>
                 </tr>
               </thead>
               <tbody>
