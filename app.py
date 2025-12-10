@@ -1,7 +1,6 @@
 import cv2
 import pandas as pd
 from flask import Flask, render_template, Response, request, jsonify, redirect, url_for, session, flash, make_response, send_file
-import threading
 import time
 import re
 from datetime import datetime
@@ -24,7 +23,7 @@ last_scanned_id = None
 scan_cooldown = 3
 attendance_status = {"status": "info", "message": "Please scan your QR code."}
 
-# --- Utility Functions ---
+
 def initialize_camera():
     global camera
     if camera is None:
@@ -120,7 +119,7 @@ def generate_frames():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
 
-# --- Page Routes ---
+
 @app.route('/')
 def index():
     release_camera()
@@ -227,13 +226,12 @@ def download_attendance():
         flash('Could not find students.csv to download.')
         return redirect(url_for('admin'))
     
-# show attendance percentages
+
 
 @app.route('/attendance_percentages')
 def attendance_percentages_page():
     
     data = get_all_students_percentage('students.csv')
-    # Convert to a sorted list by student name for predictable display
     students = sorted(data.values(), key=lambda x: x.get('student_name', ''))
     return render_template('percentage.html', students=students)
 
