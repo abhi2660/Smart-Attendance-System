@@ -46,23 +46,27 @@
                     class="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg text-sm mr-3">
                     Leave Requests
                 </a>
+                <button id="syncBtn"
+                    class="bg-yellow-500 hover:bg-yellow-400 text-black font-semibold py-2 px-4 rounded-lg text-sm">
+                    Sync to Cloud
+                </button>
                 <a href="{{ url_for('logout') }}"
                     class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg text-sm">Logout</a>
             </div>
-         </div>
-         <h1 class="text-4xl font-bold mb-6 text-center text-cyan-400">Admin Dashboard</h1>
+        </div>
+        <h1 class="text-4xl font-bold mb-6 text-center text-cyan-400">Admin Dashboard</h1>
 
 
-         {% with messages = get_flashed_messages() %}
-         {% if messages %}
-         <div class="bg-green-600 text-white p-3 rounded-lg mb-4 text-center">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="bg-green-600 text-white p-3 rounded-lg mb-4 text-center">
             {{ messages[0] }}
-         </div>
-          {% endif %}
-         {% endwith %}
+        </div>
+        {% endif %}
+        {% endwith %}
 
 
-         <div class="bg-gray-800 p-6 rounded-2xl shadow-xl mb-8">
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-xl mb-8">
             <h2 class="text-2xl font-semibold mb-4">Add New Student</h2>
             <form action="{{ url_for('admin') }}" method="POST" class="flex flex-col sm:flex-row gap-4">
                 <input type="hidden" name="action" value="add">
@@ -166,10 +170,10 @@
             const askToReset = () => {
                 setTimeout(() => {
                     if (confirm("Do you want to reset all student data ?")) {
-                        
+
                         window.location.href = "{{ url_for('reset_attendance') }}";
                     }
-                }, 100); 
+                }, 100);
             };
 
 
@@ -189,6 +193,31 @@
                 askToReset();
             }
         };
+
+
+        document.getElementById('syncBtn').addEventListener('click', async function () {
+            if (!confirm("Sync local attendance CSV to cloud now?")) return;
+
+            const btn = this;
+            btn.disabled = true;
+            const orig = btn.innerText;
+            btn.innerText = "Syncing...";
+
+            try {
+                const resp = await fetch("/admin/sync_attendance", { method: "POST" });
+                const data = await resp.json();
+                if (resp.ok && data.status === "ok") {
+                    alert(`Sync complete!\nAdded: ${data.summary.added}\nUpdated: ${data.summary.updated}\nDeleted: ${data.summary.deleted}\nTotal rows: ${data.summary.total_csv_rows}`);
+                } else {
+                    alert("Sync failed: " + (data.message || JSON.stringify(data)));
+                }
+            } catch (err) {
+                alert("Sync error: " + err);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = orig;
+            }
+        });
     </script>
 </body>
 

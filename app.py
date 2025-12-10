@@ -7,6 +7,11 @@ from datetime import datetime
 import traceback
 import leave
 
+
+from flask import jsonify
+import sync        
+
+
 from percentage import get_all_students_percentage
 
 app = Flask(__name__)
@@ -367,6 +372,20 @@ def download_leave_requests():
     return send_file(leave.LEAVE_CSV, as_attachment=True, download_name="leave_requests.csv")
 
 
+
+@app.route("/admin/sync_attendance", methods=["POST"])
+def admin_sync_attendance():
+    
+    if not session.get("logged_in"):
+        return jsonify({"error": "not_authorized"}), 403
+
+    try:
+        csv_path = "students.csv"   
+        summary = sync.sync_csv(csv_path)
+        return jsonify({"status": "ok", "summary": summary})
+    except Exception as e:
+        # return error for frontend to show
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 
