@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Parents</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-900 text-white p-6">
+
+<div class="max-w-4xl mx-auto">
+
+    <a href="{{ url_for('admin') }}" class="text-cyan-400">&larr; Back</a>
+
+    <h1 class="text-3xl mb-6 text-cyan-400">Manage Parents</h1>
+
+    <!-- Add Form -->
+    <form method="POST" action="/admin/add_parent" class="grid grid-cols-3 gap-4 mb-6">
+        <input name="student_id" placeholder="Student ID" required class="p-2 bg-gray-700 rounded">
+        <input name="parent_name" placeholder="Parent Name" required class="p-2 bg-gray-700 rounded">
+        <input name="email" placeholder="parent@gmail.com" required class="p-2 bg-gray-700 rounded">
+
+        <button class="col-span-3 bg-indigo-600 p-2 rounded">Add Parent</button>
+    </form>
+
+    <!-- Table -->
+    <table class="w-full bg-gray-800">
+        <thead>
+            <tr class="bg-gray-700">
+                <th class="p-2">ID</th>
+                <th class="p-2">Name</th>
+                <th class="p-2">Email</th>
+                <th class="p-2">Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for p in parents %}
+        <tr>
+            <td class="p-2">{{ p.student_id }}</td>
+
+            <td class="p-2">
+                <form method="POST" action="/admin/update_parent" class="flex gap-2">
+                    <input type="hidden" name="student_id" value="{{ p.student_id }}">
+
+                    <input name="parent_name" value="{{ p.parent_name }}" 
+                           class="bg-gray-700 p-1 rounded">
+
+                    <input name="email" value="{{ p.email }}" 
+                           class="bg-gray-700 p-1 rounded">
+
+                    <button type="submit" class="bg-blue-600 px-2 py-1 rounded">
+                        Update
+                    </button>
+                </form>
+            </td>
+
+            <td class="p-2"></td>
+
+            <td class="p-2">
+                <a href="/admin/delete_parent/{{ p.student_id }}"
+                   class="bg-red-600 px-2 py-1 rounded">
+                   Delete
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>
