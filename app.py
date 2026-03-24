@@ -14,6 +14,8 @@ import sync
 
 from percentage import get_all_students_percentage
 
+import notify
+
 app = Flask(__name__)
 
 app.secret_key = 'VeEr_007' 
@@ -386,6 +388,69 @@ def admin_sync_attendance():
     except Exception as e:
         # return error for frontend to show
         return jsonify({"status": "error", "message": str(e)}), 500
+
+
+# Parent management 
+
+@app.route("/admin/parents")
+def manage_parents():
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
+
+    parents = notify.get_all_parents()
+    return render_template("parents.html", parents=parents)
+
+
+@app.route("/admin/add_parent", methods=["POST"])
+def add_parent():
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
+
+    success = notify.add_parent(
+        request.form["student_id"],
+        request.form["parent_name"],
+        request.form["whatsapp_number"]
+    )
+
+    if success:
+        flash("Parent added successfully")
+    else:
+        flash("Parent already exists")
+
+    return redirect(url_for("manage_parents"))
+
+@app.route("/admin/update_parent", methods=["POST"])
+def update_parent():
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
+
+    notify.update_parent(
+        request.form["student_id"],
+        request.form["parent_name"],
+        request.form["email"]
+    )
+
+    flash("Parent updated successfully")
+    return redirect(url_for("manage_parents"))
+
+@app.route("/admin/delete_parent/<student_id>")
+def delete_parent(student_id):
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
+
+    notify.delete_parent(student_id)
+    flash("Parent deleted")
+
+    return redirect(url_for("manage_parents"))
+
+
+@app.route("/admin/send_notifications", methods=["POST"])
+def send_notifications():
+    if not session.get("logged_in"):
+        return jsonify({"error": "not_authorized"}), 403
+
+    result = notify.send_attendance_notifications()
+    return jsonify({"status": "done", "result": result})
 
 
 
