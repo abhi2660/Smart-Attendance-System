@@ -62,6 +62,7 @@ def extract(node):
 @app.route("/")
 def index():
     data = fetch_all()
+    # print("JSON data:", data.json())
     if not data:
         return "Error fetching Firebase data", 500
 

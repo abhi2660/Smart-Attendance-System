@@ -15,12 +15,10 @@
         <a href="{{ url_for('index') }}" class="text-cyan-400 hover:text-cyan-300 mb-4 inline-block">&larr; Back to Home</a>
         <h1 class="text-4xl font-bold mb-4 text-cyan-400">Scan Your QR Code</h1>
         
-        <!-- Status Message Display -->
         <div id="status-container" class="mb-4 p-4 rounded-lg text-xl font-semibold transition-colors duration-500">
             <p id="status-message">Initializing camera...</p>
         </div>
         
-        <!-- Video Feed -->
         <div class="bg-gray-800 rounded-2xl shadow-xl overflow-hidden aspect-video">
              <img id="video-feed" src="{{ url_for('video_feed') }}" alt="Video Stream" class="w-full h-full object-cover">
         </div>
